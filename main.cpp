@@ -7,6 +7,7 @@
 #include "main.h"
 #include "utility.h"
 #include <QMessageBox>
+// #include <OpenXLSX/OpenXLSX.hpp>
 
 User myUser;
 QSqlDatabase db;
@@ -51,6 +52,11 @@ int main(int argc, char *argv[])
         db.close();
         exit(0);
     }
+
+    // // load college data for distances (default data)
+    // std::string filename = "collegedist.csv";
+    // std::vector<CollegeData> collegeData = loadCollegeDataCSV(filename);
+
     MainWindow w;
     w.show();
     db.close();

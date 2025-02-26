@@ -27,11 +27,11 @@ void login::on_label_5_linkActivated(const QString &link)
     r.show();
 }
 
-void login::on_label_5_linkHovered(const QString &link)
-{
-    reguser r;
-    r.show();
-}
+// void login::on_label_5_linkHovered(const QString &link)
+// {
+//     reguser r;
+//     r.show();
+// }
 
 void login::on_pushButton_clicked()
 {

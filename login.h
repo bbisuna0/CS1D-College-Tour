@@ -18,7 +18,7 @@ public:
 private slots:
     void on_label_5_linkActivated(const QString &link);
 
-    void on_label_5_linkHovered(const QString &link);
+    // void on_label_5_linkHovered(const QString &link);
 
     void on_pushButton_clicked();
 

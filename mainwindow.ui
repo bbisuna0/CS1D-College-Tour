@@ -46,14 +46,14 @@
     <item row="0" column="1">
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="collegeDistanceButton">
         <property name="text">
          <string>Display College Distances</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_2">
+       <widget class="QPushButton" name="souvenirButton">
         <property name="text">
          <string>Display Souvenirs</string>
         </property>
@@ -118,7 +118,7 @@
      <x>0</x>
      <y>0</y>
      <width>439</width>
-     <height>37</height>
+     <height>18</height>
     </rect>
    </property>
   </widget>
@@ -145,7 +145,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>pushButton</sender>
+   <sender>collegeDistanceButton</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
    <slot>show()</slot>
