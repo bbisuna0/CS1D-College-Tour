@@ -11,6 +11,9 @@
 
 User myUser;
 QSqlDatabase db;
+std::vector<CollegeData> collegeList;
+std::vector<SouvenirData> souvenirList;
+
 
 int main(int argc, char *argv[])
 {
@@ -53,12 +56,13 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
-    // // load college data for distances (default data)
-    // std::string filename = "collegedist.csv";
-    // std::vector<CollegeData> collegeData = loadCollegeDataCSV(filename);
+    // load college data for distances (default data)
+    collegeList = loadCollegeDataCSV(ORIGINAL_COLLEGE_FILE);
+    souvenirList = loadSouvenirCSV(ORIGINAL_SOUVENIR_FILE);
 
-    MainWindow w;
-    w.show();
+    MainWindow w(collegeList, souvenirList, NULL);
+    //w.show();
+    w.showNormal();
     db.close();
     return a.exec();
     //a.quit();

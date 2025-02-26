@@ -3,6 +3,8 @@
 #include <QStandardItemModel>
 #include <QStandardItem>
 #include <QSortFilterProxyModel>
+#include "purchasesouvenirs.h"
+#include "utility.h"
 
 tripdisplay::tripdisplay(QWidget *parent)
     : QDialog(parent)
@@ -63,6 +65,20 @@ void tripdisplay::on_buttonBox_accepted()
 
 void tripdisplay::on_saddlebackPB_clicked()
 {
-    filterTable("Saddleback College");
+    std::vector<SouvenirData> data;
+    data = loadSouvenirCSV("souvenirs1.csv");
+    std::vector<SouvenirPurchase> editData;
+    SouvenirPurchase editRow;
+    for (auto row : data) {
+        editRow.college = row.college;
+        editRow.souvenir =  row.souvenir;
+        editRow.cost =row.cost;
+        editRow.quantity = 0;
+        if (isCollegeMatch(model, QString::fromStdString(row.college))){
+            editData.push_back(editRow);
+        }
+    }
+    purchasesouvenirs c(editData, this);
+    c.exec();
 }
 

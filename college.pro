@@ -30,7 +30,9 @@ SOURCES += \
     listsouvenirs.cpp \
     login.cpp \
     main.cpp \
+    maintenance.cpp \
     mainwindow.cpp \
+    purchasesouvenirs.cpp \
     reguser.cpp \
     tripdisplay.cpp \
     tripplanning.cpp \
@@ -41,8 +43,10 @@ HEADERS += \
     listsouvenirs.h \
     login.h \
     main.h \
+    maintenance.h \
     mainwindow.h \
     mergedtableview.h \
+    purchasesouvenirs.h \
     reguser.h \
     tripdisplay.h \
     tripplanning.h \
@@ -52,7 +56,9 @@ FORMS += \
     collegedistances.ui \
     listsouvenirs.ui \
     login.ui \
+    maintenance.ui \
     mainwindow.ui \
+    purchasesouvenirs.ui \
     reguser.ui \
     tripdisplay.ui \
     tripplanning.ui

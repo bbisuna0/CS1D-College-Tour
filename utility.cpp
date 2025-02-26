@@ -145,6 +145,27 @@ bool checkPassword(QString uname, QString pass, bool &admin, QString &uid) // ch
 }
 
 
+float stringToFloatDollar(std::string str) {
+    std::string modifiedStr = str; // Create a copy to modify
+
+    if (!modifiedStr.empty() && modifiedStr[0] == '$') {
+        modifiedStr = modifiedStr.substr(1); // Remove the leading '$'
+    }
+
+    std::stringstream ss(modifiedStr);
+    float result;
+
+    if (ss >> result) {
+        char remaining;
+        if (ss >> remaining) {
+            throw std::invalid_argument("Invalid float format: trailing characters.");
+        }
+        return result;
+    } else {
+        throw std::invalid_argument("Invalid float format: no valid float found.");
+    }
+}
+
 // Function to trim leading and trailing spaces from a string, preserving spaces inside quotes
 std::string trim(const std::string& str) {
     size_t first = str.find_first_not_of(' ');
@@ -157,6 +178,7 @@ std::string trim(const std::string& str) {
 
 std::vector<CollegeData> loadCollegeDataCSV(const std::string& filename) {
     std::vector<CollegeData> data;
+    std::unordered_set<CollegeData> seen;  // To track unique rows
     std::ifstream file(filename);
 
     if (!file.is_open()) {
@@ -199,15 +221,23 @@ std::vector<CollegeData> loadCollegeDataCSV(const std::string& filename) {
         if (fields.size() >= 3) {
             try {
                 float distance = std::stof(fields[fields.size() - 1]);
+                CollegeData newData;
                 if (fields.size() == 3) {
-                    data.push_back({fields[0], fields[1], distance});
+                    newData = {fields[0], fields[1], distance};
                 } else if (fields.size() > 3) {
                     std::string collegeEnd = fields[1];
                     for (size_t i = 2; i < fields.size() - 1; ++i) {
                         collegeEnd += ", " + fields[i];
                     }
-                    data.push_back({fields[0], collegeEnd, distance});
+                    newData = {fields[0], collegeEnd, distance};
                 }
+
+                // Only add if not already seen
+                if (seen.find(newData) == seen.end()) {
+                    data.push_back(newData);
+                    seen.insert(newData); // Mark as seen
+                }
+
             } catch (const std::invalid_argument& e) {
                 std::cerr << "Warning: Invalid distance value in line: " << line << std::endl;
             } catch (const std::out_of_range& e) {
@@ -221,6 +251,87 @@ std::vector<CollegeData> loadCollegeDataCSV(const std::string& filename) {
     file.close();
     return data;
 }
+
+
+// append
+std::vector<CollegeData> loadCollegeDataCSV(const std::string& filename, std::vector<CollegeData>& data) {
+    std::unordered_set<CollegeData> seen;  // To track unique rows
+    std::ifstream file(filename);
+
+    if (!file.is_open()) {
+        std::cerr << "Error: Could not open file " << filename << std::endl;
+        return data;
+    }
+
+    std::string line;
+    std::getline(file, line); // Skip header
+
+    while (std::getline(file, line)) {
+        std::vector<std::string> fields;
+        std::stringstream ss(line);
+        std::string field;
+        bool inQuotes = false;
+        std::string currentField;
+
+        while (std::getline(ss, field, ',')) {
+            if (inQuotes) {
+                currentField += (currentField.empty() ? "" : ",") + field; // Add comma if not first part
+                if (field.back() == '"') {
+                    inQuotes = false;
+                    fields.push_back(trim(currentField.substr(0, currentField.length() - 1))); // Trim after closing quote
+                    currentField = "";
+                }
+            } else {
+                if (field.front() == '"') {
+                    inQuotes = true;
+                    currentField = field.substr(1); // Remove starting quote
+                } else {
+                    fields.push_back(trim(field)); // Trim non-quoted fields
+                }
+            }
+        }
+
+        if (!currentField.empty()) { // Handle the last field if still in quotes
+            fields.push_back(trim(currentField));
+        }
+
+        if (fields.size() >= 3) {
+            try {
+                float distance = std::stof(fields[fields.size() - 1]);
+                CollegeData newData;
+                if (fields.size() == 3) {
+                    newData = {fields[0], fields[1], distance};
+                } else if (fields.size() > 3) {
+                    std::string collegeEnd = fields[1];
+                    for (size_t i = 2; i < fields.size() - 1; ++i) {
+                        collegeEnd += ", " + fields[i];
+                    }
+                    newData = {fields[0], collegeEnd, distance};
+                }
+
+                qDebug() << QString::fromStdString(newData.collegeStart);
+                qDebug() << QString::fromStdString(newData.collegeEnd);
+                qDebug() << newData.distance;
+                // Only add if not already seen
+                if (seen.find(newData) == seen.end()) {
+                    data.push_back(newData);
+                    seen.insert(newData); // Mark as seen
+                }
+
+            } catch (const std::invalid_argument& e) {
+                std::cerr << "Warning: Invalid distance value in line: " << line << std::endl;
+            } catch (const std::out_of_range& e) {
+                std::cerr << "Warning: Distance value out of range in line: " << line << std::endl;
+            }
+        } else {
+            std::cerr << "Warning: Incorrect format in line: " << line << std::endl;
+        }
+    }
+
+    file.close();
+    return data;
+}
+
 
 std::vector<SouvenirData> loadSouvenirCSV(const std::string& filename) {
     std::vector<SouvenirData> data;
@@ -319,5 +430,99 @@ std::vector<CollegeData> planShortestTrip(const std::string& startCollege, std::
     }
 
     return route;
+}
+
+float findClosestCollege2(const std::string& currentCollege, std::vector<CollegeData>& data, std::unordered_set<std::string>& visitedCampuses, int& nextIndex, const std::unordered_set<std::string>& collegesToVisit) {
+    float minDistance = std::numeric_limits<float>::max();
+    nextIndex = -1;
+
+    for (size_t i = 0; i < data.size(); ++i) {
+        if (visitedCampuses.find(data[i].collegeEnd) == visitedCampuses.end() &&
+            data[i].collegeStart == currentCollege &&
+            data[i].distance < minDistance &&
+            collegesToVisit.find(data[i].collegeEnd) != collegesToVisit.end()) {
+            minDistance = data[i].distance;
+            nextIndex = i;
+        }
+    }
+    return minDistance;
+}
+
+std::vector<CollegeData> planEfficientTrip(const QStringList& collegesToVisit, std::vector<CollegeData> data, float& totalDistance) {
+    std::vector<CollegeData> route;
+    std::unordered_set<std::string> visitedCampuses;
+    totalDistance = 0.0;
+
+    if (collegesToVisit.isEmpty()) {
+        return route; // Return empty route if no colleges are provided
+    }
+
+    std::string currentCollege = collegesToVisit.first().toStdString();
+    visitedCampuses.insert(currentCollege);
+
+    std::unordered_set<std::string> remainingColleges;
+    for (int i = 1; i < collegesToVisit.size(); ++i) {
+        remainingColleges.insert(collegesToVisit[i].toStdString());
+    }
+
+    while (!remainingColleges.empty()) {
+        int nextIndex;
+        float distance = findClosestCollege2(currentCollege, data, visitedCampuses, nextIndex, remainingColleges);
+
+        if (nextIndex == -1) {
+            // No valid next college found from the current college
+            // Find the closest remaining college from all visited colleges
+            int bestNextIndex = -1;
+            float bestDistance = std::numeric_limits<float>::max();
+            std::string bestStartCollege;
+
+            for (const auto& visited : visitedCampuses) {
+                int tempNextIndex;
+                float tempDistance = findClosestCollege2(visited, data, visitedCampuses, tempNextIndex, remainingColleges);
+                if (tempNextIndex != -1 && tempDistance < bestDistance) {
+                    bestDistance = tempDistance;
+                    bestNextIndex = tempNextIndex;
+                    bestStartCollege = visited;
+                }
+            }
+
+            if (bestNextIndex == -1) {
+                break; // No path to remaining colleges
+            }
+            nextIndex = bestNextIndex;
+            distance = bestDistance;
+            currentCollege = bestStartCollege;
+
+        }
+
+        route.push_back(data[nextIndex]);
+        totalDistance += distance;
+        currentCollege = data[nextIndex].collegeEnd;
+        visitedCampuses.insert(currentCollege);
+        remainingColleges.erase(currentCollege);
+    }
+
+    return route;
+}
+
+bool isCollegeMatch(QStandardItemModel* model, const QString& searchValue) {
+    if (!model) return false;
+
+    for (int row = 0; row < model->rowCount(); ++row) {
+        QStandardItem* startItem = model->item(row, 0); // Column 0: collegeStart
+        QStandardItem* endItem = model->item(row, 1);   // Column 1: collegeEnd
+
+        if (startItem && startItem->text() == searchValue) {
+            return true; // Match found
+        } else if (endItem && endItem->text() == searchValue) {
+            return true; // Match found
+        }
+    }
+    return false; // No match found
+}
+
+void showFileLoadedMessage(QWidget* parent, const QString filename) {
+    QString message = QString("File '%1' successfully loaded.").arg(filename);
+    QMessageBox::information(parent, "File Loaded", message);
 }
 

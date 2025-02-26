@@ -16,7 +16,7 @@ class collegedistances : public QDialog
 
 public:
     explicit collegedistances(QWidget *parent = nullptr);
-    explicit collegedistances(const std::vector<CollegeData>& data, QWidget *parent = nullptr);
+    explicit collegedistances(std::vector<CollegeData>& data, QWidget *parent = nullptr);
     ~collegedistances();
 
 private slots:

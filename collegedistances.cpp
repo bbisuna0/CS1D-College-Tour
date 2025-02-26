@@ -12,7 +12,7 @@ collegedistances::collegedistances(QWidget *parent)
 
 }
 
-collegedistances::collegedistances(const std::vector<CollegeData>& data, QWidget *parent)
+collegedistances::collegedistances(std::vector<CollegeData>& data, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::collegedistances)
 {

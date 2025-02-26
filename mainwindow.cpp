@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QDir>
 #include "tripplanning.h"
+#include "maintenance.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -18,6 +19,19 @@ MainWindow::MainWindow(QWidget *parent)
     }
 }
 
+MainWindow::MainWindow(std::vector<CollegeData>& collegeListParm, std::vector<SouvenirData>& souvenirListParm, QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    if (!myUser.admin)
+    {
+        ui->pushButton_5->setEnabled(false);
+    }
+    collegeList = collegeListParm;
+    souvenirList = souvenirListParm;
+}
+
 MainWindow::~MainWindow()
 {
     delete ui;
@@ -26,15 +40,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_collegeDistanceButton_clicked()
 {
-    std::vector<CollegeData> data;
-    data = loadCollegeDataCSV("collegedist1.csv");
-    QString currentDir = QDir::currentPath();
-    qDebug() << "Current working directory:" << currentDir;
-    qDebug() << QString::fromStdString(data[6].collegeStart);
-    qDebug() << QString::fromStdString(data[6].collegeEnd);
-    qDebug() << data[6].distance;
-    collegedistances c(data, this);
-    //c.setAttribute(Qt::WA_DeleteOnClose);
+    // std::vector<CollegeData> data;
+    // data = loadCollegeDataCSV("collegedist1.csv");
+    // QString currentDir = QDir::currentPath();
+    // qDebug() << "Current working directory:" << currentDir;
+    // qDebug() << QString::fromStdString(data[6].collegeStart);
+    // qDebug() << QString::fromStdString(data[6].collegeEnd);
+    // qDebug() << data[6].distance;
+    collegedistances c(collegeList, this);
     c.exec();
 }
 
@@ -46,24 +59,25 @@ void MainWindow::on_pushButton_6_clicked()
 
 void MainWindow::on_pushButton_4_clicked()
 {
-    tripplanning c;
+    tripplanning c(collegeList, souvenirList, this);
     c.exec();
 }
 
 void MainWindow::on_souvenirButton_clicked()
 {
-    std::vector<SouvenirData> data;
-    data = loadSouvenirCSV("souvenirs1.csv");
-    qDebug() << QString::fromStdString(data[0].college);
-    qDebug() << QString::fromStdString(data[0].souvenir);
-    qDebug() << QString::fromStdString(data[0].cost);
-    listsouvenirs c(data, this);
-    //c.setAttribute(Qt::WA_DeleteOnClose);
+    // std::vector<SouvenirData> data;
+    // data = loadSouvenirCSV("souvenirs1.csv");
+    // qDebug() << QString::fromStdString(data[0].college);
+    // qDebug() << QString::fromStdString(data[0].souvenir);
+    // qDebug() << QString::fromStdString(data[0].cost);
+
+    listsouvenirs c(souvenirList, this);
     c.exec();
 }
 
 
 void MainWindow::on_pushButton_5_clicked()
 {
-
+    maintenance c;
+    c.exec();
 }
