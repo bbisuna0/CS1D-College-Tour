@@ -8,19 +8,19 @@
 #include "tripplanning.h"
 #include "maintenance.h"
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
-{
-    ui->setupUi(this);
-    if (!myUser.admin)
-    {
-        ui->pushButton_5->setEnabled(false);
-    }
-}
+// MainWindow::MainWindow(QWidget *parent)
+//     : QMainWindow(parent)
+//     , ui(new Ui::MainWindow)
+// {
+//     ui->setupUi(this);
+//     if (!myUser.admin)
+//     {
+//         ui->pushButton_5->setEnabled(false);
+//     }
+// }
 
 MainWindow::MainWindow(std::vector<CollegeData>& collegeListParm, std::vector<SouvenirData>& souvenirListParm, QWidget *parent)
-    : QMainWindow(parent)
+    : QMainWindow(parent), collegeList(collegeListParm), souvenirList(souvenirListParm)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -28,8 +28,6 @@ MainWindow::MainWindow(std::vector<CollegeData>& collegeListParm, std::vector<So
     {
         ui->pushButton_5->setEnabled(false);
     }
-    collegeList = collegeListParm;
-    souvenirList = souvenirListParm;
 }
 
 MainWindow::~MainWindow()
@@ -42,8 +40,8 @@ void MainWindow::on_collegeDistanceButton_clicked()
 {
     // std::vector<CollegeData> data;
     // data = loadCollegeDataCSV("collegedist1.csv");
-    // QString currentDir = QDir::currentPath();
-    // qDebug() << "Current working directory:" << currentDir;
+    QString currentDir = QDir::currentPath();
+    qDebug() << "Current working directory:" << currentDir;
     // qDebug() << QString::fromStdString(data[6].collegeStart);
     // qDebug() << QString::fromStdString(data[6].collegeEnd);
     // qDebug() << data[6].distance;
@@ -78,6 +76,7 @@ void MainWindow::on_souvenirButton_clicked()
 
 void MainWindow::on_pushButton_5_clicked()
 {
-    maintenance c;
+    maintenance c(collegeList, souvenirList, this);
     c.exec();
+    qDebug() << "Size of list main: " << collegeList.size();
 }

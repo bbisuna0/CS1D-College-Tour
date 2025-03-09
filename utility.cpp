@@ -253,7 +253,6 @@ std::vector<CollegeData> loadCollegeDataCSV(const std::string& filename) {
 }
 
 
-// append
 std::vector<CollegeData> loadCollegeDataCSV(const std::string& filename, std::vector<CollegeData>& data) {
     std::unordered_set<CollegeData> seen;  // To track unique rows
     std::ifstream file(filename);
@@ -268,33 +267,49 @@ std::vector<CollegeData> loadCollegeDataCSV(const std::string& filename, std::ve
 
     while (std::getline(file, line)) {
         std::vector<std::string> fields;
-        std::stringstream ss(line);
         std::string field;
         bool inQuotes = false;
         std::string currentField;
 
-        while (std::getline(ss, field, ',')) {
+        // Loop through each character in the line, process based on quote state
+        for (size_t i = 0; i < line.size(); ++i) {
+            char ch = line[i];
+
             if (inQuotes) {
-                currentField += (currentField.empty() ? "" : ",") + field; // Add comma if not first part
-                if (field.back() == '"') {
-                    inQuotes = false;
-                    fields.push_back(trim(currentField.substr(0, currentField.length() - 1))); // Trim after closing quote
-                    currentField = "";
+                // If inside quotes, accumulate characters in currentField
+                currentField += ch;
+
+                // If closing quote is found, close the quoted field
+                if (ch == '"') {
+                    // Check for the case of two quotes in a row (escaped quote within a quoted string)
+                    if (i + 1 < line.size() && line[i + 1] == '"') {
+                        currentField += '"'; // Add one quote to the field
+                        ++i; // Skip next quote
+                    } else {
+                        inQuotes = false;
+                    }
                 }
             } else {
-                if (field.front() == '"') {
+                if (ch == '"') {
+                    // Start of quoted field
                     inQuotes = true;
-                    currentField = field.substr(1); // Remove starting quote
+                    currentField.clear(); // Reset the current field to start accumulating data
+                } else if (ch == ',') {
+                    // End of a non-quoted field, add to fields vector
+                    fields.push_back(trim(currentField));
+                    currentField.clear(); // Clear the current field
                 } else {
-                    fields.push_back(trim(field)); // Trim non-quoted fields
+                    currentField += ch; // Accumulate characters for the current field
                 }
             }
         }
 
-        if (!currentField.empty()) { // Handle the last field if still in quotes
+        // Add the last field (after the last comma)
+        if (!currentField.empty()) {
             fields.push_back(trim(currentField));
         }
 
+        // Now we need to ensure there are at least 3 fields (start college, end college, and distance)
         if (fields.size() >= 3) {
             try {
                 float distance = std::stof(fields[fields.size() - 1]);
@@ -309,9 +324,6 @@ std::vector<CollegeData> loadCollegeDataCSV(const std::string& filename, std::ve
                     newData = {fields[0], collegeEnd, distance};
                 }
 
-                qDebug() << QString::fromStdString(newData.collegeStart);
-                qDebug() << QString::fromStdString(newData.collegeEnd);
-                qDebug() << newData.distance;
                 // Only add if not already seen
                 if (seen.find(newData) == seen.end()) {
                     data.push_back(newData);

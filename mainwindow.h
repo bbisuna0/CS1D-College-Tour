@@ -15,8 +15,8 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
-    MainWindow(std::vector<CollegeData>& collegeListParm, std::vector<SouvenirData>& souvenirListParm, QWidget *parent = nullptr);
+    // explicit MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(std::vector<CollegeData>& collegeListParm, std::vector<SouvenirData>& souvenirListParm, QWidget *parent = nullptr);
     ~MainWindow();
 
 private slots:
@@ -32,7 +32,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    std::vector<CollegeData> collegeList;
-    std::vector<SouvenirData> souvenirList;
+    std::vector<CollegeData>& collegeList;
+    std::vector<SouvenirData>& souvenirList;
 };
 #endif // MAINWINDOW_H

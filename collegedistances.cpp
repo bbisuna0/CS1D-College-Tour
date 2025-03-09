@@ -19,6 +19,7 @@ collegedistances::collegedistances(std::vector<CollegeData>& data, QWidget *pare
     ui->setupUi(this);
     model = new QStandardItemModel(this);
     //ui->tableView->setModel(model);
+    qDebug() << "Size of list: " << data.size();
 
 
     model->setHorizontalHeaderLabels({"College Start", "College End", "Distance"});

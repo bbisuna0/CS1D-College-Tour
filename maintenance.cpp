@@ -2,20 +2,18 @@
 #include "maintenance.h"
 #include <QInputDialog>
 
-maintenance::maintenance(QWidget *parent)
-    : QDialog(parent)
-    , ui(new Ui::maintenance)
-{
-    ui->setupUi(this);
-}
+// maintenance::maintenance(QWidget *parent)
+//     : QDialog(parent)
+//     , ui(new Ui::maintenance)
+// {
+//     ui->setupUi(this);
+// }
 
 maintenance::maintenance(std::vector<CollegeData>& collegeListParm, std::vector<SouvenirData>& souvenirListParm, QWidget *parent)
-    : QDialog(parent)
+    : QDialog(parent), collegeList(collegeListParm), souvenirList(souvenirListParm)
     , ui(new Ui::maintenance)
 {
     ui->setupUi(this);
-    collegeList = collegeListParm;
-    souvenirList = souvenirListParm;
 }
 
 maintenance::~maintenance()
@@ -46,9 +44,12 @@ void maintenance::on_loadOrgSouvenirDataButton_clicked()
 
 void maintenance::on_loadBulkDataButton_clicked()
 {
-    // std::vector<CollegeData> newList;
-    collegeList = loadCollegeDataCSV(BULK_FILE, collegeList);
-    // collegeList = newList;
+    std::vector<CollegeData> newList;
+    newList = loadCollegeDataCSV(BULK_FILE, collegeList);
+    // collegeList = loadCollegeDataCSV(ORIGINAL_COLLEGE_FILE, collegeList);
+    //collegeList = newList;
+    qDebug() << "Size of list: " << newList.size();
+    qDebug() << "Size of list: " << collegeList.size();
     showFileLoadedMessage(this, QString::fromStdString(BULK_FILE));
 }
 

@@ -14,7 +14,7 @@ class maintenance : public QDialog
     Q_OBJECT
 
 public:
-    explicit maintenance(QWidget *parent = nullptr);
+    // explicit maintenance(QWidget *parent = nullptr);
     explicit maintenance(std::vector<CollegeData>& collegeListParm, std::vector<SouvenirData>& souvenirListParm, QWidget *parent = nullptr);
     ~maintenance();
 
@@ -29,8 +29,8 @@ private slots:
 
 private:
     Ui::maintenance *ui;
-    std::vector<CollegeData> collegeList;
-    std::vector<SouvenirData> souvenirList;
+    std::vector<CollegeData>& collegeList;
+    std::vector<SouvenirData>& souvenirList;
 };
 
 #endif // MAINTENANCE_H
