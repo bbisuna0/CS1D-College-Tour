@@ -35,6 +35,7 @@ SOURCES += \
     mainwindow.cpp \
     purchasesouvenirs.cpp \
     reguser.cpp \
+    souvenirdialog.cpp \
     tripdisplay.cpp \
     tripplanning.cpp \
     utility.cpp
@@ -50,6 +51,7 @@ HEADERS += \
     mergedtableview.h \
     purchasesouvenirs.h \
     reguser.h \
+    souvenirdialog.h \
     tripdisplay.h \
     tripplanning.h \
     utility.h

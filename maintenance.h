@@ -29,6 +29,16 @@ private slots:
 
     void on_editCollegeDataButton_clicked();
 
+    void on_editSouvenirDataButton_clicked();
+
+    void on_saveCollegeDataButton_clicked();
+
+    void on_saveSouvenirDataButton_clicked();
+
+    void on_loadUpdatedCollegeDataButton_clicked();
+
+    void on_loadUpdatedSouvenirDataButton_clicked();
+
 private:
     Ui::maintenance *ui;
     std::vector<CollegeData>& collegeList;

@@ -2,6 +2,7 @@
 #include "maintenance.h"
 #include <QInputDialog>
 #include "collegeeditordialog.h"
+#include "souvenirdialog.h"
 
 // maintenance::maintenance(QWidget *parent)
 //     : QDialog(parent)
@@ -61,5 +62,44 @@ void maintenance::on_editCollegeDataButton_clicked()
     if (editor.exec() == QDialog::Accepted) {
         // Changes are saved automatically as we passed by reference
     }
+}
+
+
+void maintenance::on_editSouvenirDataButton_clicked()
+{
+    // Create and show the souvenir dialog
+    SouvenirDialog dialog(souvenirList, this);
+    dialog.exec();
+}
+
+
+void maintenance::on_saveCollegeDataButton_clicked()
+{
+    // UPDATED_COLLEGE_FILE
+    saveCollegeListToCSV(collegeList, UPDATED_COLLEGE_FILE);
+    showFileSavedMessage(this, QString::fromStdString(UPDATED_COLLEGE_FILE));
+}
+
+
+void maintenance::on_saveSouvenirDataButton_clicked()
+{
+    // UPDATED_COLLEGE_FILE
+    saveSouvenirListToCSV(souvenirList, UPDATED_SOUVENIR_FILE);
+    showFileSavedMessage(this, QString::fromStdString(UPDATED_SOUVENIR_FILE));
+}
+
+
+void maintenance::on_loadUpdatedCollegeDataButton_clicked()
+{
+    collegeList = loadCollegeDataCSV(UPDATED_COLLEGE_FILE);
+    showFileLoadedMessage(this, QString::fromStdString(UPDATED_COLLEGE_FILE));
+}
+
+
+void maintenance::on_loadUpdatedSouvenirDataButton_clicked()
+{
+    // load souvenir data for distances (default data)
+    souvenirList = loadSouvenirCSV(UPDATED_SOUVENIR_FILE);
+    showFileLoadedMessage(this, QString::fromStdString(UPDATED_SOUVENIR_FILE));
 }
 

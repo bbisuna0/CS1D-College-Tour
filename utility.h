@@ -82,6 +82,9 @@ float findClosestCollege2(const std::string& currentCollege, std::vector<College
 std::vector<CollegeData> planEfficientTrip(const QStringList& collegesToVisit, std::vector<CollegeData> data, float& totalDistance);
 bool isCollegeMatch(QStandardItemModel* model, const QString& searchValue);
 void showFileLoadedMessage(QWidget* parent, const QString filename);
+void showFileSavedMessage(QWidget* parent, const QString filename);
+void saveCollegeListToCSV(const std::vector<CollegeData>& collegeList, const std::string& filename);
+void saveSouvenirListToCSV(const std::vector<SouvenirData>& souvenirList, const std::string& filename);
 
 
 

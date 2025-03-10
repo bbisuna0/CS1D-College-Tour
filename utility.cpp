@@ -538,3 +538,59 @@ void showFileLoadedMessage(QWidget* parent, const QString filename) {
     QMessageBox::information(parent, "File Loaded", message);
 }
 
+
+void showFileSavedMessage(QWidget* parent, const QString filename) {
+    QString message = QString("File '%1' successfully Saved.").arg(filename);
+    QMessageBox::information(parent, "File Saved", message);
+}
+
+
+void saveCollegeListToCSV(const std::vector<CollegeData>& collegeList, const std::string& filename) {
+    std::ofstream outFile(filename);
+
+    if (!outFile.is_open()) {
+        throw std::runtime_error("Failed to open file: " + filename);
+    }
+
+    // Write header
+    outFile << "collegeStart,collegeEnd,distance\n";
+
+    // Function to properly format a field (enclose in quotes if it contains a comma)
+    auto formatCSVField = [](const std::string& field) -> std::string {
+        return (field.find(',') != std::string::npos) ? "\"" + field + "\"" : field;
+    };
+
+    // Write data rows
+    for (const auto& college : collegeList) {
+        outFile << formatCSVField(college.collegeStart) << ","
+                << formatCSVField(college.collegeEnd) << ","
+                << college.distance << "\n";
+    }
+
+    outFile.close();
+}
+
+void saveSouvenirListToCSV(const std::vector<SouvenirData>& souvenirList, const std::string& filename) {
+    std::ofstream outFile(filename);
+
+    if (!outFile.is_open()) {
+        throw std::runtime_error("Failed to open file: " + filename);
+    }
+
+    // Write CSV header
+    outFile << "college,souvenir,cost\n";
+
+    // Function to properly format a field (enclose in quotes if it contains a comma)
+    auto formatCSVField = [](const std::string& field) -> std::string {
+        return (field.find(',') != std::string::npos) ? "\"" + field + "\"" : field;
+    };
+
+    // Write data rows
+    for (const auto& souvenir : souvenirList) {
+        outFile << formatCSVField(souvenir.college) << ","
+                << formatCSVField(souvenir.souvenir) << ","
+                << formatCSVField(souvenir.cost) << "\n";
+    }
+
+    outFile.close();
+}
