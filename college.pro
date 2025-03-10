@@ -27,6 +27,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     collegedistances.cpp \
+    collegeeditordialog.cpp \
     listsouvenirs.cpp \
     login.cpp \
     main.cpp \
@@ -40,6 +41,7 @@ SOURCES += \
 
 HEADERS += \
     collegedistances.h \
+    collegeeditordialog.h \
     listsouvenirs.h \
     login.h \
     main.h \
@@ -54,6 +56,7 @@ HEADERS += \
 
 FORMS += \
     collegedistances.ui \
+    collegeeditordialog.ui \
     listsouvenirs.ui \
     login.ui \
     maintenance.ui \

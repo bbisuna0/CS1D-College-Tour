@@ -1,6 +1,7 @@
 #include "utility.h"
 #include "maintenance.h"
 #include <QInputDialog>
+#include "collegeeditordialog.h"
 
 // maintenance::maintenance(QWidget *parent)
 //     : QDialog(parent)
@@ -51,5 +52,14 @@ void maintenance::on_loadBulkDataButton_clicked()
     qDebug() << "Size of list: " << newList.size();
     qDebug() << "Size of list: " << collegeList.size();
     showFileLoadedMessage(this, QString::fromStdString(BULK_FILE));
+}
+
+
+void maintenance::on_editCollegeDataButton_clicked()
+{
+    CollegeEditorDialog editor(collegeList, this);
+    if (editor.exec() == QDialog::Accepted) {
+        // Changes are saved automatically as we passed by reference
+    }
 }
 

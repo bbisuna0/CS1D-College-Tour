@@ -27,6 +27,8 @@ private slots:
 
     void on_loadBulkDataButton_clicked();
 
+    void on_editCollegeDataButton_clicked();
+
 private:
     Ui::maintenance *ui;
     std::vector<CollegeData>& collegeList;
