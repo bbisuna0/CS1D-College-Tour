@@ -1,4 +1,3 @@
-
 on:
   push:
     branches: [ main ]
@@ -26,13 +25,29 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ matrix.qt_version }}
+          host: mac
+          target: desktop
+          arch: clang_64
+          modules: qtsvg
 
       - name: Install Qt (Windows)
         if: matrix.os == 'windows-latest'
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ matrix.qt_version }}
+          host: windows
           target: desktop
+          arch: win64_msvc2019_64
+          modules: qtsvg
+
+      - name: Install Doxygen (macOS)
+        if: matrix.os == 'macos-latest'
+        run: brew install doxygen
+
+      - name: Install Doxygen (Windows)
+        if: matrix.os == 'windows-latest'
+        run: choco install doxygen.install
+        shell: powershell
 
       - name: Configure CMake
         run: |
@@ -45,13 +60,23 @@ jobs:
           cd build
           cmake --build . --config Release
 
+      - name: Generate Documentation with Doxygen
+        run: |
+          doxygen Doxyfile
+
+      - name: Upload Documentation Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Doxygen-Docs
+          path: docs/html
+
       - name: Create Artifact (macOS)
         if: matrix.target == 'macos'
         run: |
           mkdir macos_build
           cp build/MyQtApp macos_build/
           tar -czvf MyQtApp-macOS.tar.gz -C macos_build .
-      - uses: actions/upload-artifact@v4 # This is now a separate step
+      - uses: actions/upload-artifact@v4
         if: matrix.target == 'macos'
         with:
           name: MyQtApp-macOS
@@ -64,7 +89,7 @@ jobs:
           cp build/Release/MyQtApp.exe windows_build/
           7z a MyQtApp-Windows.zip windows_build/*
         shell: cmd
-      - uses: actions/upload-artifact@v4 # This is now a separate step
+      - uses: actions/upload-artifact@v4
         if: matrix.target == 'windows'
         with:
           name: MyQtApp-Windows
