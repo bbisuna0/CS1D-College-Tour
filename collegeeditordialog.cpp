@@ -6,6 +6,7 @@ CollegeEditorDialog::CollegeEditorDialog(std::vector<CollegeData>& collegeList, 
     : QDialog(parent), ui(new Ui::CollegeEditorDialog), collegeList(collegeList)
 {
     ui->setupUi(this);
+    resize(970, 400);
     loadTable();  // Load data into the table
     connect(ui->collegeTableWidget, &QTableWidget::cellChanged, this, &CollegeEditorDialog::validateCell);
 
@@ -107,11 +108,6 @@ void CollegeEditorDialog::on_saveButton_clicked()
 }
 
 
-void CollegeEditorDialog::on_exitButton_clicked()
-{
-    accept();
-}
-
 void CollegeEditorDialog::validateCell(int row, int column)
 {
     QTableWidgetItem* item = ui->collegeTableWidget->item(row, column);
@@ -121,4 +117,6 @@ void CollegeEditorDialog::validateCell(int row, int column)
         item->setText("N/A");  // Reset to a default value
     }
 }
+
+
 

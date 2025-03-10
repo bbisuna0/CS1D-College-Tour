@@ -42,12 +42,19 @@
     <widget class="MergedTableView" name="tableView"/>
    </item>
    <item>
+    <widget class="QPushButton" name="pushButton">
+     <property name="text">
+      <string>List Souvenirs by College</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
+      <set>QDialogButtonBox::StandardButton::Close</set>
      </property>
     </widget>
    </item>

@@ -9,6 +9,10 @@
 #include <algorithm>
 #include <unordered_set>
 
+/**
+ * @brief Establishes a connection to the SQLite database.
+ * @return True if the connection is successful, otherwise false.
+ */
 bool createConnection()
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
@@ -21,6 +25,10 @@ bool createConnection()
     return true;
 }
 
+
+/**
+ * @brief Creates the user table in the database if it does not exist.
+ */
 void createUserTable() // QSqlDatabase &db
 {
     /*
@@ -45,6 +53,11 @@ void createUserTable() // QSqlDatabase &db
     return;
 }
 
+
+/**
+ * @brief Checks if the user table exists in the database.
+ * @return True if the table exists, otherwise false.
+ */
 bool checkUserTable() // check if user table exists
 {
     QString checkUser;
@@ -63,6 +76,11 @@ bool checkUserTable() // check if user table exists
 }
 
 
+/**
+ * @brief Checks if a username exists in the database.
+ * @param uname The username to check.
+ * @return True if the username exists, otherwise false.
+ */
 bool checkUserName(QString uname) // check if user exists
 {
     QString checkUserNameQ;
@@ -82,6 +100,13 @@ bool checkUserName(QString uname) // check if user exists
 }
 
 
+/**
+ * @brief Adds a new user to the database.
+ * @param ID The user ID (not used, as it is auto-incremented).
+ * @param username The username.
+ * @param password The password.
+ * @param admin Boolean indicating whether the user has admin privileges.
+ */
 void addUser(int ID, QString username, QString password, bool admin) // add user data into database
 {
     if (checkUserName(username))
@@ -114,6 +139,14 @@ void addUser(int ID, QString username, QString password, bool admin) // add user
 }
 
 
+/**
+ * @brief Verifies user credentials and retrieves user information.
+ * @param uname The username.
+ * @param pass The password.
+ * @param admin Reference to a boolean indicating admin privileges.
+ * @param uid Reference to a string storing the user ID.
+ * @return True if the credentials are correct, otherwise false.
+ */
 bool checkPassword(QString uname, QString pass, bool &admin, QString &uid) // check if user table exists
 {  
     QString checkPassword;
@@ -145,6 +178,12 @@ bool checkPassword(QString uname, QString pass, bool &admin, QString &uid) // ch
 }
 
 
+/**
+ * @brief Converts a dollar-formatted string to a float.
+ * @param str The string containing a dollar amount (e.g., "$12.34").
+ * @return The float representation of the amount.
+ * @throws std::invalid_argument If the string format is invalid.
+ */
 float stringToFloatDollar(std::string str) {
     std::string modifiedStr = str; // Create a copy to modify
 
@@ -166,6 +205,12 @@ float stringToFloatDollar(std::string str) {
     }
 }
 
+
+/**
+ * @brief Trims leading and trailing spaces from a string while preserving spaces inside quotes.
+ * @param str The input string.
+ * @return The trimmed string.
+ */
 // Function to trim leading and trailing spaces from a string, preserving spaces inside quotes
 std::string trim(const std::string& str) {
     size_t first = str.find_first_not_of(' ');
@@ -176,6 +221,12 @@ std::string trim(const std::string& str) {
     return str.substr(first, (last - first + 1));
 }
 
+
+/**
+ * @brief Loads college data from a CSV file.
+ * @param filename The name of the CSV file.
+ * @return A vector containing the college data.
+ */
 std::vector<CollegeData> loadCollegeDataCSV(const std::string& filename) {
     std::vector<CollegeData> data;
     std::unordered_set<CollegeData> seen;  // To track unique rows
@@ -253,6 +304,12 @@ std::vector<CollegeData> loadCollegeDataCSV(const std::string& filename) {
 }
 
 
+/**
+ * @brief Loads college data from a CSV file into an existing vector.
+ * @param filename The name of the CSV file.
+ * @param data Reference to the vector to store the college data.
+ * @return A vector containing the college data.
+ */
 std::vector<CollegeData> loadCollegeDataCSV(const std::string& filename, std::vector<CollegeData>& data) {
     std::unordered_set<CollegeData> seen;  // To track unique rows
     std::ifstream file(filename);
@@ -345,6 +402,11 @@ std::vector<CollegeData> loadCollegeDataCSV(const std::string& filename, std::ve
 }
 
 
+/**
+ * @brief Loads souvenir data from a CSV file.
+ * @param filename The name of the CSV file.
+ * @return A vector containing the souvenir data.
+ */
 std::vector<SouvenirData> loadSouvenirCSV(const std::string& filename) {
     std::vector<SouvenirData> data;
     std::ifstream file(filename);
@@ -388,6 +450,15 @@ std::vector<SouvenirData> loadSouvenirCSV(const std::string& filename) {
     return data;
 }
 
+
+/**
+ * @brief Finds the closest college to a given college that has not been visited.
+ * @param currentCollege The name of the current college.
+ * @param data The list of college data.
+ * @param visitedCampuses The set of already visited campuses.
+ * @param nextIndex Reference to store the index of the next closest college.
+ * @return The distance to the next closest college.
+ */
 float findClosestCollege(const std::string& currentCollege, std::vector<CollegeData>& data, std::unordered_set<std::string>& visitedCampuses, int& nextIndex) {
     float minDistance = std::numeric_limits<float>::max();
     nextIndex = -1;
@@ -402,6 +473,15 @@ float findClosestCollege(const std::string& currentCollege, std::vector<CollegeD
     return minDistance;
 }
 
+
+/**
+ * @brief Plans the most efficient route visiting a specific number of colleges.
+ * @param startCollege The starting college.
+ * @param data The list of college data.
+ * @param stops The number of stops to make.
+ * @param totalDistance Reference to store the total distance traveled.
+ * @return A vector containing the planned route.
+ */
 std::vector<CollegeData> planEfficientRoute(const std::string startCollege, std::vector<CollegeData> data, int stops, float& totalDistance) {
     std::vector<CollegeData> route;
     std::unordered_set<std::string> visitedCampuses;
@@ -423,6 +503,15 @@ std::vector<CollegeData> planEfficientRoute(const std::string startCollege, std:
     return route;
 }
 
+
+/**
+ * @brief Plans the shortest trip visiting a specific number of colleges.
+ * @param startCollege The starting college.
+ * @param data The list of college data.
+ * @param numStops The number of stops to make.
+ * @param totalDistance Reference to store the total distance traveled.
+ * @return A vector containing the planned route.
+ */
 std::vector<CollegeData> planShortestTrip(const std::string& startCollege, std::vector<CollegeData> data, int numStops, float& totalDistance) {
     std::vector<CollegeData> route;
     std::unordered_set<std::string> visitedCampuses;
@@ -444,6 +533,16 @@ std::vector<CollegeData> planShortestTrip(const std::string& startCollege, std::
     return route;
 }
 
+
+/**
+ * @brief Finds the closest unvisited college from a list of specific colleges to visit.
+ * @param currentCollege The name of the current college.
+ * @param data The list of college data.
+ * @param visitedCampuses The set of already visited campuses.
+ * @param nextIndex Reference to store the index of the next closest college.
+ * @param collegesToVisit The set of colleges that need to be visited.
+ * @return The distance to the next closest college.
+ */
 float findClosestCollege2(const std::string& currentCollege, std::vector<CollegeData>& data, std::unordered_set<std::string>& visitedCampuses, int& nextIndex, const std::unordered_set<std::string>& collegesToVisit) {
     float minDistance = std::numeric_limits<float>::max();
     nextIndex = -1;
@@ -460,6 +559,14 @@ float findClosestCollege2(const std::string& currentCollege, std::vector<College
     return minDistance;
 }
 
+
+/**
+ * @brief Plans an efficient trip visiting a specified list of colleges.
+ * @param collegesToVisit The list of colleges to visit.
+ * @param data The list of college data.
+ * @param totalDistance Reference to store the total distance traveled.
+ * @return A vector containing the planned route.
+ */
 std::vector<CollegeData> planEfficientTrip(const QStringList& collegesToVisit, std::vector<CollegeData> data, float& totalDistance) {
     std::vector<CollegeData> route;
     std::unordered_set<std::string> visitedCampuses;
@@ -517,6 +624,13 @@ std::vector<CollegeData> planEfficientTrip(const QStringList& collegesToVisit, s
     return route;
 }
 
+
+/**
+ * @brief Checks if a given college name is present in the model.
+ * @param model The QStandardItemModel containing the college data.
+ * @param searchValue The college name to search for.
+ * @return True if the college is found, otherwise false.
+ */
 bool isCollegeMatch(QStandardItemModel* model, const QString& searchValue) {
     if (!model) return false;
 
@@ -533,18 +647,35 @@ bool isCollegeMatch(QStandardItemModel* model, const QString& searchValue) {
     return false; // No match found
 }
 
+
+/**
+ * @brief Displays a message box indicating a file was successfully loaded.
+ * @param parent The parent QWidget.
+ * @param filename The name of the loaded file.
+ */
 void showFileLoadedMessage(QWidget* parent, const QString filename) {
     QString message = QString("File '%1' successfully loaded.").arg(filename);
     QMessageBox::information(parent, "File Loaded", message);
 }
 
 
+/**
+ * @brief Displays a message box indicating a file was successfully saved.
+ * @param parent The parent QWidget.
+ * @param filename The name of the saved file.
+ */
 void showFileSavedMessage(QWidget* parent, const QString filename) {
     QString message = QString("File '%1' successfully Saved.").arg(filename);
     QMessageBox::information(parent, "File Saved", message);
 }
 
 
+/**
+ * @brief Saves the list of colleges to a CSV file.
+ * @param collegeList The vector containing college data.
+ * @param filename The name of the output CSV file.
+ * @throws std::runtime_error If the file cannot be opened.
+ */
 void saveCollegeListToCSV(const std::vector<CollegeData>& collegeList, const std::string& filename) {
     std::ofstream outFile(filename);
 
@@ -570,6 +701,13 @@ void saveCollegeListToCSV(const std::vector<CollegeData>& collegeList, const std
     outFile.close();
 }
 
+
+/**
+ * @brief Saves the list of souvenirs to a CSV file.
+ * @param souvenirList The vector containing souvenir data.
+ * @param filename The name of the output CSV file.
+ * @throws std::runtime_error If the file cannot be opened.
+ */
 void saveSouvenirListToCSV(const std::vector<SouvenirData>& souvenirList, const std::string& filename) {
     std::ofstream outFile(filename);
 

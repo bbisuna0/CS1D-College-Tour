@@ -1,8 +1,8 @@
-#include "SouvenirDialog.h"
+#include "souvenirdisplay.h".h"
 #include <QDoubleValidator>
 #include <QDebug>
 
-SouvenirDialog::SouvenirDialog(std::vector<SouvenirData>& souvenirList, QWidget* parent)
+SouvenirDisplay::SouvenirDisplay(std::vector<SouvenirData>& souvenirList, QWidget* parent)
     : QDialog(parent), souvenirList(souvenirList) {
 
     setWindowTitle("Edit Souvenirs");
@@ -14,7 +14,7 @@ SouvenirDialog::SouvenirDialog(std::vector<SouvenirData>& souvenirList, QWidget*
 
     // Combo Box for Colleges
     collegeComboBox = new QComboBox(this);
-    connect(collegeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SouvenirDialog::onCollegeSelectionChanged);
+    connect(collegeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SouvenirDisplay::onCollegeSelectionChanged);
     mainLayout->addWidget(collegeComboBox);
 
     // Table Widget
@@ -25,20 +25,14 @@ SouvenirDialog::SouvenirDialog(std::vector<SouvenirData>& souvenirList, QWidget*
     tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
     tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     tableWidget->setEditTriggers(QAbstractItemView::DoubleClicked);
-    connect(tableWidget, &QTableWidget::cellChanged, this, &SouvenirDialog::onCellChanged);
+    connect(tableWidget, &QTableWidget::cellChanged, this, &SouvenirDisplay::onCellChanged);
     mainLayout->addWidget(tableWidget);
 
     // Buttons
-    addButton = new QPushButton("Add", this);
-    deleteButton = new QPushButton("Delete", this);
-    saveButton = new QPushButton("Save", this);
+    saveButton = new QPushButton("Exit", this);
 
-    connect(addButton, &QPushButton::clicked, this, &SouvenirDialog::onAddRow);
-    connect(deleteButton, &QPushButton::clicked, this, &SouvenirDialog::onDeleteRow);
-    connect(saveButton, &QPushButton::clicked, this, &SouvenirDialog::onSave);
+    connect(saveButton, &QPushButton::clicked, this, &SouvenirDisplay::onSave);
 
-    buttonLayout->addWidget(addButton);
-    buttonLayout->addWidget(deleteButton);
     buttonLayout->addWidget(saveButton);
     mainLayout->addLayout(buttonLayout);
 
@@ -52,7 +46,7 @@ SouvenirDialog::SouvenirDialog(std::vector<SouvenirData>& souvenirList, QWidget*
     }
 }
 
-void SouvenirDialog::populateColleges() {
+void SouvenirDisplay::populateColleges() {
     std::set<std::string> collegeNames;
 
     // Extract unique college names from souvenirList
@@ -75,13 +69,13 @@ void SouvenirDialog::populateColleges() {
     }
 }
 
-void SouvenirDialog::onCollegeSelectionChanged(int index) {
+void SouvenirDisplay::onCollegeSelectionChanged(int index) {
     storeCurrentSouvenirs();
     currentCollege = collegeComboBox->currentText().toStdString();
     loadSouvenirs(currentCollege);
 }
 
-void SouvenirDialog::loadSouvenirs(const std::string& college) {
+void SouvenirDisplay::loadSouvenirs(const std::string& college) {
     tableWidget->clearContents();
     tableWidget->setRowCount(0);
 
@@ -95,7 +89,7 @@ void SouvenirDialog::loadSouvenirs(const std::string& college) {
     }
 }
 
-void SouvenirDialog::storeCurrentSouvenirs() {
+void SouvenirDisplay::storeCurrentSouvenirs() {
     if (currentCollege.empty()) return;
 
     std::vector<SouvenirData> updatedList;
@@ -111,38 +105,38 @@ void SouvenirDialog::storeCurrentSouvenirs() {
     collegeSouvenirs[currentCollege] = updatedList;
 }
 
-void SouvenirDialog::onAddRow() {
+void SouvenirDisplay::onAddRow() {
     int row = tableWidget->rowCount();
     tableWidget->insertRow(row);
     tableWidget->setItem(row, 0, new QTableWidgetItem(""));
     tableWidget->setItem(row, 1, new QTableWidgetItem("$0.00"));
 }
 
-void SouvenirDialog::onDeleteRow() {
+void SouvenirDisplay::onDeleteRow() {
     int row = tableWidget->currentRow();
     if (row >= 0) {
         tableWidget->removeRow(row);
     }
 }
 
-void SouvenirDialog::onSave() {
-    storeCurrentSouvenirs();
-    souvenirList.clear();
-    for (const auto& [college, souvenirs] : collegeSouvenirs) {
-        for (const auto& souvenir : souvenirs) {
-            souvenirList.push_back(souvenir);
-        }
-    }
+void SouvenirDisplay::onSave() {
+    // storeCurrentSouvenirs();
+    // souvenirList.clear();
+    // for (const auto& [college, souvenirs] : collegeSouvenirs) {
+    //     for (const auto& souvenir : souvenirs) {
+    //         souvenirList.push_back(souvenir);
+    //     }
+    // }
     accept();
 }
 
-void SouvenirDialog::onCellChanged(int row, int column) {
+void SouvenirDisplay::onCellChanged(int row, int column) {
     if (column == 1) {
         formatCostField(row);
     }
 }
 
-bool SouvenirDialog::validateRow(int row) {
+bool SouvenirDisplay::validateRow(int row) {
     if (!tableWidget->item(row, 0) || tableWidget->item(row, 0)->text().trimmed().isEmpty()) {
         QMessageBox::warning(this, "Invalid Entry", "Souvenir name cannot be empty.");
         return false;
@@ -156,7 +150,7 @@ bool SouvenirDialog::validateRow(int row) {
     return true;
 }
 
-void SouvenirDialog::formatCostField(int row) {
+void SouvenirDisplay::formatCostField(int row) {
     QTableWidgetItem* item = tableWidget->item(row, 1);
     if (!item) return;
 
@@ -170,6 +164,6 @@ void SouvenirDialog::formatCostField(int row) {
     item->setText(QString("$%1").arg(cost, 0, 'f', 2));
 }
 
-std::vector<SouvenirData> SouvenirDialog::getUpdatedSouvenirList() const {
+std::vector<SouvenirData> SouvenirDisplay::getUpdatedSouvenirList() const {
     return souvenirList;
 }

@@ -14,13 +14,17 @@ class listsouvenirs : public QDialog
     Q_OBJECT
 
 public:
-    explicit listsouvenirs(QWidget *parent = nullptr);
-    explicit listsouvenirs(const std::vector<SouvenirData>& data, QWidget *parent = nullptr);
+    //explicit listsouvenirs(QWidget *parent = nullptr);
+    explicit listsouvenirs(std::vector<SouvenirData>& data, QWidget *parent = nullptr);
     ~listsouvenirs();
+
+private slots:
+    void on_pushButton_clicked();
 
 private:
     Ui::listsouvenirs *ui;
     QStandardItemModel *model;
+    std::vector<SouvenirData>& souvenirList;
 };
 
 #endif // LISTSOUVENIRS_H

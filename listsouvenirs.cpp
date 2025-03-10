@@ -2,18 +2,19 @@
 #include "ui_listsouvenirs.h"
 #include "mergedtableview.h"
 #include <QStandardItemModel>
+#include "souvenirdisplay.h"
 
-listsouvenirs::listsouvenirs(QWidget *parent)
+// listsouvenirs::listsouvenirs(QWidget *parent)
+//     : QDialog(parent)
+//     , ui(new Ui::listsouvenirs)
+// {
+//     ui->setupUi(this);
+// }
+
+
+listsouvenirs::listsouvenirs(std::vector<SouvenirData>& data, QWidget *parent)
     : QDialog(parent)
-    , ui(new Ui::listsouvenirs)
-{
-    ui->setupUi(this);
-}
-
-
-listsouvenirs::listsouvenirs(const std::vector<SouvenirData>& data, QWidget *parent)
-    : QDialog(parent)
-    , ui(new Ui::listsouvenirs)
+    , ui(new Ui::listsouvenirs), souvenirList(data)
 {
     ui->setupUi(this);
     model = new QStandardItemModel(this);
@@ -53,3 +54,10 @@ listsouvenirs::~listsouvenirs()
 {
     delete ui;
 }
+
+void listsouvenirs::on_pushButton_clicked()
+{
+    SouvenirDisplay dialog(souvenirList, this);
+    dialog.exec();
+}
+

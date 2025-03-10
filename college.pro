@@ -36,6 +36,7 @@ SOURCES += \
     purchasesouvenirs.cpp \
     reguser.cpp \
     souvenirdialog.cpp \
+    souvenirdisplay.cpp \
     tripdisplay.cpp \
     tripplanning.cpp \
     utility.cpp
@@ -52,6 +53,7 @@ HEADERS += \
     purchasesouvenirs.h \
     reguser.h \
     souvenirdialog.h \
+    souvenirdisplay.h \
     tripdisplay.h \
     tripplanning.h \
     utility.h

@@ -21,8 +21,8 @@ private slots:
     void on_addButton_clicked();
     void on_deleteButton_clicked();
     void on_saveButton_clicked();
-    void on_exitButton_clicked();
     void validateCell(int row, int column);
+
 
 private:
     Ui::CollegeEditorDialog *ui;

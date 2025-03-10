@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Trip Planning</string>
+   <string>Maintenance</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
