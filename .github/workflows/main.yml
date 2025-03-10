@@ -1,77 +1,39 @@
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
-    strategy:
-      matrix:
-        os: [windows-latest]
-        include:
-          - os: macos-latest
-            qt_version: "5.15.0"
-            target: macos
-            arch: clang_64
-          - os: windows-latest
-            qt_version: "5.15.0"
-            target: windows
-            arch: win64_msvc2019_64
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Check out repository
+        uses: actions/checkout@v3
 
-      - name: Install Qt (macOS)
-        if: matrix.os == 'macos-latest'
+      - name: Install Qt (Windows - MinGW)
         uses: jurplel/install-qt-action@v3
         with:
-          aqtversion: '==3.1.*'
-          version: ${{ matrix.qt_version }}
-          host: mac
-          target: desktop
-          arch: ${{ matrix.arch }}
-          modules: qtbase, qttools, qtsvg
-
-      - name: Install Qt (Windows)
-        if: matrix.os == 'windows-latest'
-        uses: jurplel/install-qt-action@v3
-        with:
-          version: ${{ matrix.qt_version }}
+          version: "5.15.0"
           host: windows
           target: desktop
-          arch: ${{ matrix.arch }}
+          arch: win64_mingw81
           modules: qtbase, qttools, qtsvg
 
-      - name: Install Doxygen (macOS)
-        if: matrix.os == 'macos-latest'
-        run: brew install doxygen
-
-      - name: Install Doxygen (Windows)
-        if: matrix.os == 'windows-latest'
+      - name: Install Doxygen
         run: choco install doxygen.install
         shell: powershell
 
-      - name: Build using qmake (macOS)
-        if: matrix.os == 'macos-latest'
+      - name: Build using qmake (Windows - MinGW)
         run: |
           mkdir build
           cd build
-          qmake ../college.pro -spec macx-clang CONFIG+=release
-          make -j$(sysctl -n hw.ncpu)
-
-      - name: Build using qmake (Windows)
-        if: matrix.os == 'windows-latest'
-        run: |
-          mkdir build
-          cd build
-          qmake ../college.pro -spec win32-msvc CONFIG+=release
-          nmake
+          qmake ../college.pro -spec win32-g++
+          mingw32-make
         shell: cmd
 
       - name: Generate Documentation with Doxygen
-        run: |
-          doxygen Doxyfile
+        run: doxygen Doxyfile
 
       - name: Upload Documentation Artifact
         uses: actions/upload-artifact@v4
@@ -79,27 +41,14 @@ jobs:
           name: Doxygen-Docs
           path: docs/html
 
-      - name: Create Artifact (macOS)
-        if: matrix.target == 'macos'
-        run: |
-          mkdir macos_build
-          cp build/college.app/Contents/MacOS/college macos_build/
-          tar -czvf college-macOS.tar.gz -C macos_build .
-      - uses: actions/upload-artifact@v4
-        if: matrix.target == 'macos'
-        with:
-          name: college-macOS
-          path: college-macOS.tar.gz
-
-      - name: Create Artifact (Windows)
-        if: matrix.target == 'windows'
+      - name: Create Windows Artifact
         run: |
           mkdir windows_build
           copy build\release\college.exe windows_build\
           7z a college-Windows.zip windows_build\*
         shell: cmd
+
       - uses: actions/upload-artifact@v4
-        if: matrix.target == 'windows'
         with:
           name: college-Windows
           path: college-Windows.zip
