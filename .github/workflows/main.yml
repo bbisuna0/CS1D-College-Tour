@@ -28,8 +28,8 @@ jobs:
         run: |
           mkdir build
           cd build
-          qmake ../college.pro -spec win32-g++
-          mingw32-make
+          qmake ../college.pro 
+          mingw32-make -j16
         shell: cmd
 
       - name: Generate Documentation with Doxygen
