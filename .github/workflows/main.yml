@@ -8,7 +8,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]
+        os: [windows-latest]
         include:
           - os: macos-latest
             qt_version: "5.15.0"
