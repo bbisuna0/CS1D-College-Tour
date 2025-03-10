@@ -21,8 +21,17 @@ jobs:
           archives: 'qttools qtsvg qtbase'
 
       - name: Install Doxygen
-        run: choco install doxygen.install
+        run: choco install doxygen.install -y
         shell: powershell
+
+      - name: Add Doxygen to PATH
+        run: |
+          echo "C:\Program Files\doxygen\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8
+        shell: powershell
+
+      - name: Verify Doxygen Installation
+        run: doxygen --version
+        shell: cmd
 
       - name: Build using qmake (Windows - MinGW)
         run: |
@@ -34,6 +43,7 @@ jobs:
 
       - name: Generate Documentation with Doxygen
         run: doxygen Doxyfile
+        shell: cmd
 
       - name: Upload Documentation Artifact
         uses: actions/upload-artifact@v4
