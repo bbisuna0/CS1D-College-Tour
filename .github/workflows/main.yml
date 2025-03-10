@@ -1,0 +1,71 @@
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
+        include:
+          - os: macos-latest
+            qt_version: "5.15.18"
+            target: macos
+          - os: windows-latest
+            qt_version: "5.15.18"
+            target: windows
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Qt (macOS)
+        if: matrix.os == 'macos-latest'
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ matrix.qt_version }}
+
+      - name: Install Qt (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ matrix.qt_version }}
+          target: desktop
+
+      - name: Configure CMake
+        run: |
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: |
+          cd build
+          cmake --build . --config Release
+
+      - name: Create Artifact (macOS)
+        if: matrix.target == 'macos'
+        run: |
+          mkdir macos_build
+          cp build/MyQtApp macos_build/
+          tar -czvf MyQtApp-macOS.tar.gz -C macos_build .
+      - uses: actions/upload-artifact@v4 # This is now a separate step
+        if: matrix.target == 'macos'
+        with:
+          name: MyQtApp-macOS
+          path: MyQtApp-macOS.tar.gz
+
+      - name: Create Artifact (Windows)
+        if: matrix.target == 'windows'
+        run: |
+          mkdir windows_build
+          cp build/Release/MyQtApp.exe windows_build/
+          7z a MyQtApp-Windows.zip windows_build/*
+        shell: cmd
+      - uses: actions/upload-artifact@v4 # This is now a separate step
+        if: matrix.target == 'windows'
+        with:
+          name: MyQtApp-Windows
+          path: MyQtApp-Windows.zip
