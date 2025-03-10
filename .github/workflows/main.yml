@@ -24,7 +24,7 @@ jobs:
 
       - name: Install Qt (macOS)
         if: matrix.os == 'macos-latest'
-        uses: jurplel/install-qt-action@v4
+        uses: jurplel/install-qt-action@v3
         with:
           version: ${{ matrix.qt_version }}
           host: mac
@@ -34,7 +34,7 @@ jobs:
 
       - name: Install Qt (Windows)
         if: matrix.os == 'windows-latest'
-        uses: jurplel/install-qt-action@v4
+        uses: jurplel/install-qt-action@v3
         with:
           version: ${{ matrix.qt_version }}
           host: windows
