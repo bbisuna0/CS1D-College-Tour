@@ -11,11 +11,11 @@ jobs:
         os: [macos-latest, windows-latest]
         include:
           - os: macos-latest
-            qt_version: "5.15.2"
+            qt_version: "5.15.0"
             target: macos
             arch: clang_64
           - os: windows-latest
-            qt_version: "5.15.2"
+            qt_version: "5.15.0"
             target: windows
             arch: win64_msvc2019_64
     runs-on: ${{ matrix.os }}
