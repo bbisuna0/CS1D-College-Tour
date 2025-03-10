@@ -1,0 +1,64 @@
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Qt (Windows - MinGW)
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: "5.15.2"
+          host: windows
+          target: desktop
+          arch: win64_mingw81
+          archives: 'qttools qtsvg qtbase'
+
+      - name: Install Doxygen
+        run: choco install doxygen.install -y
+        shell: powershell
+
+      - name: Add Doxygen to PATH
+        run: |
+          echo "C:\Program Files\doxygen\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8
+        shell: powershell
+
+      - name: Verify Doxygen Installation
+        run: doxygen --version
+        shell: cmd
+
+      - name: Build using qmake (Windows - MinGW)
+        run: |
+          mkdir build
+          cd build
+          qmake ../college.pro 
+          mingw32-make -j16
+        shell: cmd
+
+      - name: Generate Documentation with Doxygen
+        run: doxygen Doxyfile
+        shell: cmd
+
+      - name: Upload Documentation Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Doxygen-Docs
+          path: docs/html
+
+      - name: Create Windows Artifact
+        run: |
+          mkdir windows_build
+          copy build\release\college.exe windows_build\
+          7z a college-Windows.zip windows_build\*
+        shell: cmd
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: college-Windows
+          path: college-Windows.zip
