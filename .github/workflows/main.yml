@@ -18,7 +18,7 @@ jobs:
           host: windows
           target: desktop
           arch: win64_mingw81
-          modules: qtbase, qttools, qtsvg
+          archives: 'qttools qtsvg qtbase'
 
       - name: Install Doxygen
         run: choco install doxygen.install
