@@ -57,8 +57,10 @@ int main(int argc, char *argv[])
     }
 
     // load college data for distances (default data)
-    collegeList = loadCollegeDataCSV(ORIGINAL_COLLEGE_FILE);
-    souvenirList = loadSouvenirCSV(ORIGINAL_SOUVENIR_FILE);
+    // collegeList = loadCollegeDataCSV(ORIGINAL_COLLEGE_FILE);
+    // souvenirList = loadSouvenirCSV(ORIGINAL_SOUVENIR_FILE);
+    collegeList = loadCollegeDataCSV(UPDATED_COLLEGE_FILE);
+    souvenirList = loadSouvenirCSV(UPDATED_SOUVENIR_FILE);
 
     MainWindow w(collegeList, souvenirList, NULL);
     //w.show();

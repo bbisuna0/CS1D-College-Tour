@@ -30,7 +30,8 @@ struct CollegeData {
     float distance;
 
     bool operator==(const CollegeData& other) const {
-        return collegeStart == other.collegeStart && collegeEnd == other.collegeEnd && distance == other.distance;
+        //return collegeStart == other.collegeStart && collegeEnd == other.collegeEnd && distance == other.distance;
+        return collegeStart == other.collegeStart && collegeEnd == other.collegeEnd;
     }
 };
 

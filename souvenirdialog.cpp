@@ -138,6 +138,7 @@ void SouvenirDialog::onSave() {
             souvenirList.push_back(souvenir);
         }
     }
+    saveSouvenirListToCSV(souvenirList, UPDATED_SOUVENIR_FILE);
     accept();
 }
 

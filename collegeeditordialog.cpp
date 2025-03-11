@@ -103,7 +103,7 @@ void CollegeEditorDialog::on_saveButton_clicked()
 
         collegeList.push_back(college);
     }
-
+    saveCollegeListToCSV(collegeList, UPDATED_COLLEGE_FILE);
     accept();  // Close the dialog and save changes
 }
 

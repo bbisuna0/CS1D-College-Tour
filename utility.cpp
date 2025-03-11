@@ -287,7 +287,7 @@ std::vector<CollegeData> loadCollegeDataCSV(const std::string& filename) {
 
                 // Only add if not already seen
                 if (seen.find(newData) == seen.end()) {
-                    qDebug() << QString::fromStdString(newData.collegeStart) << " - " << QString::fromStdString(newData.collegeEnd) << newData.distance;
+                    //qDebug() << QString::fromStdString(newData.collegeStart) << " - " << QString::fromStdString(newData.collegeEnd) << newData.distance;
                     data.push_back(newData);
                     seen.insert(newData); // Mark as seen
                 }
@@ -316,6 +316,10 @@ std::vector<CollegeData> loadCollegeDataCSV(const std::string& filename) {
  */
 std::vector<CollegeData> loadCollegeDataCSV(const std::string& filename, std::vector<CollegeData>& data) {
     std::unordered_set<CollegeData> seen;  // To track unique rows
+    for (auto a: data) {
+        seen.insert(a);
+    }
+    qDebug() << "Size seen: " << seen.size();
     //std::set<CollegeData> seen;
     std::ifstream file(filename);
 
@@ -373,8 +377,9 @@ std::vector<CollegeData> loadCollegeDataCSV(const std::string& filename, std::ve
                 // Only add if not already seen
                 if (seen.find(newData) == seen.end()) {
                     data.push_back(newData);
-                    qDebug() << QString::fromStdString(newData.collegeStart) << " - " << QString::fromStdString(newData.collegeEnd) << newData.distance;
+                    //qDebug() << QString::fromStdString(newData.collegeStart) << " - " << QString::fromStdString(newData.collegeEnd) << newData.distance;
                     seen.insert(newData); // Mark as seen
+                    qDebug() << "Size of new data:" << seen.size();
                 }
 
             } catch (const std::invalid_argument& e) {

@@ -21,11 +21,12 @@ login::~login()
     delete ui;
 }
 
-void login::on_label_5_linkActivated(const QString &link)
-{
-    reguser r;
-    r.show();
-}
+// //void login::on_label_5_linkActivated(const QString &link)
+// void login::on_label_5_linkActivated()
+// {
+//     reguser r;
+//     r.show();
+// }
 
 // void login::on_label_5_linkHovered(const QString &link)
 // {
