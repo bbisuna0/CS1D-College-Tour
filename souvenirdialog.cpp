@@ -89,8 +89,13 @@ void SouvenirDialog::loadSouvenirs(const std::string& college) {
         for (const auto& souvenir : collegeSouvenirs[college]) {
             int row = tableWidget->rowCount();
             tableWidget->insertRow(row);
+            // QLineEdit *editor = new QLineEdit();
+            // editor->setValidator(new QDoubleValidator(editor));
+
             tableWidget->setItem(row, 0, new QTableWidgetItem(QString::fromStdString(souvenir.souvenir)));
             tableWidget->setItem(row, 1, new QTableWidgetItem(QString::fromStdString(souvenir.cost)));
+
+            // tableWidget->setCellWidget(row, 1, editor);
         }
     }
 }
@@ -138,6 +143,12 @@ void SouvenirDialog::onSave() {
 
 void SouvenirDialog::onCellChanged(int row, int column) {
     if (column == 1) {
+        // bool isNumeric;
+        // tableWidget->item(row, column)->text().toDouble(&isNumeric);  // Try converting to double
+
+        // if (!isNumeric) {
+        //     tableWidget->item(row, column)->setText("0");  // Clear invalid input
+        // }
         formatCostField(row);
     }
 }
@@ -164,6 +175,7 @@ void SouvenirDialog::formatCostField(int row) {
     double cost = item->text().remove('$').toDouble(&ok);
     if (!ok) {
         QMessageBox::warning(this, "Invalid Entry", "Cost must be a number.");
+        item->setText("0");
         return;
     }
 

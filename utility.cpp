@@ -8,6 +8,7 @@
 #include <limits>
 #include <algorithm>
 #include <unordered_set>
+#include <set>
 
 /**
  * @brief Establishes a connection to the SQLite database.
@@ -230,6 +231,92 @@ std::string trim(const std::string& str) {
 std::vector<CollegeData> loadCollegeDataCSV(const std::string& filename) {
     std::vector<CollegeData> data;
     std::unordered_set<CollegeData> seen;  // To track unique rows
+    //std::set<CollegeData> seen;
+    std::ifstream file(filename);
+
+    if (!file.is_open()) {
+        std::cerr << "Error: Could not open file " << filename << std::endl;
+        return data;
+    }
+
+    std::string line;
+    std::getline(file, line); // Skip header
+
+    while (std::getline(file, line)) {
+        std::vector<std::string> fields;
+        std::stringstream ss(line);
+        std::string field;
+        bool inQuotes = false;
+        std::string currentField;
+
+        while (std::getline(ss, field, ',')) {
+            if (inQuotes) {
+                currentField += (currentField.empty() ? "" : ",") + field; // Add comma if not first part
+                if (field.back() == '"') {
+                    inQuotes = false;
+                    fields.push_back(trim(currentField.substr(0, currentField.length() - 1))); // Trim after closing quote
+                    currentField = "";
+                }
+            } else {
+                if (field.front() == '"') {
+                    inQuotes = true;
+                    currentField = field.substr(1); // Remove starting quote
+                } else {
+                    fields.push_back(trim(field)); // Trim non-quoted fields
+                }
+            }
+        }
+
+        if (!currentField.empty()) { // Handle the last field if still in quotes
+            fields.push_back(trim(currentField));
+        }
+
+        if (fields.size() >= 3) {
+            try {
+                float distance = std::stof(fields[fields.size() - 1]);
+                CollegeData newData;
+                if (fields.size() == 3) {
+                    newData = {fields[0], fields[1], distance};
+                } else if (fields.size() > 3) {
+                    std::string collegeEnd = fields[1];
+                    for (size_t i = 2; i < fields.size() - 1; ++i) {
+                        collegeEnd += ", " + fields[i];
+                    }
+                    newData = {fields[0], collegeEnd, distance};
+                }
+
+                // Only add if not already seen
+                if (seen.find(newData) == seen.end()) {
+                    qDebug() << QString::fromStdString(newData.collegeStart) << " - " << QString::fromStdString(newData.collegeEnd) << newData.distance;
+                    data.push_back(newData);
+                    seen.insert(newData); // Mark as seen
+                }
+                // data.push_back(newData);
+
+            } catch (const std::invalid_argument& e) {
+                std::cerr << "Warning: Invalid distance value in line: " << line << std::endl;
+            } catch (const std::out_of_range& e) {
+                std::cerr << "Warning: Distance value out of range in line: " << line << std::endl;
+            }
+        } else {
+            std::cerr << "Warning: Incorrect format in line: " << line << std::endl;
+        }
+    }
+
+    file.close();
+    return data;
+}
+
+
+/**
+ * @brief Loads college data from a CSV file into an existing vector.
+ * @param filename The name of the CSV file.
+ * @param data Reference to the vector to store the college data.
+ * @return A vector containing the college data.
+ */
+std::vector<CollegeData> loadCollegeDataCSV(const std::string& filename, std::vector<CollegeData>& data) {
+    std::unordered_set<CollegeData> seen;  // To track unique rows
+    //std::set<CollegeData> seen;
     std::ifstream file(filename);
 
     if (!file.is_open()) {
@@ -286,104 +373,7 @@ std::vector<CollegeData> loadCollegeDataCSV(const std::string& filename) {
                 // Only add if not already seen
                 if (seen.find(newData) == seen.end()) {
                     data.push_back(newData);
-                    seen.insert(newData); // Mark as seen
-                }
-
-            } catch (const std::invalid_argument& e) {
-                std::cerr << "Warning: Invalid distance value in line: " << line << std::endl;
-            } catch (const std::out_of_range& e) {
-                std::cerr << "Warning: Distance value out of range in line: " << line << std::endl;
-            }
-        } else {
-            std::cerr << "Warning: Incorrect format in line: " << line << std::endl;
-        }
-    }
-
-    file.close();
-    return data;
-}
-
-
-/**
- * @brief Loads college data from a CSV file into an existing vector.
- * @param filename The name of the CSV file.
- * @param data Reference to the vector to store the college data.
- * @return A vector containing the college data.
- */
-std::vector<CollegeData> loadCollegeDataCSV(const std::string& filename, std::vector<CollegeData>& data) {
-    std::unordered_set<CollegeData> seen;  // To track unique rows
-    std::ifstream file(filename);
-
-    if (!file.is_open()) {
-        std::cerr << "Error: Could not open file " << filename << std::endl;
-        return data;
-    }
-
-    std::string line;
-    std::getline(file, line); // Skip header
-
-    while (std::getline(file, line)) {
-        std::vector<std::string> fields;
-        std::string field;
-        bool inQuotes = false;
-        std::string currentField;
-
-        // Loop through each character in the line, process based on quote state
-        for (size_t i = 0; i < line.size(); ++i) {
-            char ch = line[i];
-
-            if (inQuotes) {
-                // If inside quotes, accumulate characters in currentField
-                currentField += ch;
-
-                // If closing quote is found, close the quoted field
-                if (ch == '"') {
-                    // Check for the case of two quotes in a row (escaped quote within a quoted string)
-                    if (i + 1 < line.size() && line[i + 1] == '"') {
-                        currentField += '"'; // Add one quote to the field
-                        ++i; // Skip next quote
-                    } else {
-                        inQuotes = false;
-                    }
-                }
-            } else {
-                if (ch == '"') {
-                    // Start of quoted field
-                    inQuotes = true;
-                    currentField.clear(); // Reset the current field to start accumulating data
-                } else if (ch == ',') {
-                    // End of a non-quoted field, add to fields vector
-                    fields.push_back(trim(currentField));
-                    currentField.clear(); // Clear the current field
-                } else {
-                    currentField += ch; // Accumulate characters for the current field
-                }
-            }
-        }
-
-        // Add the last field (after the last comma)
-        if (!currentField.empty()) {
-            fields.push_back(trim(currentField));
-        }
-
-        // Now we need to ensure there are at least 3 fields (start college, end college, and distance)
-        if (fields.size() >= 3) {
-            try {
-                float distance = std::stof(fields[fields.size() - 1]);
-                CollegeData newData;
-                if (fields.size() == 3) {
-                    newData = {fields[0], fields[1], distance};
-                } else if (fields.size() > 3) {
-                    std::string collegeEnd = fields[1];
-                    for (size_t i = 2; i < fields.size() - 1; ++i) {
-                        collegeEnd += ", " + fields[i];
-                    }
-                    newData = {fields[0], collegeEnd, distance};
-                }
-
-                // Only add if not already seen
-                if (seen.find(newData) == seen.end()) {
-                    data.push_back(newData);
+                    qDebug() << QString::fromStdString(newData.collegeStart) << " - " << QString::fromStdString(newData.collegeEnd) << newData.distance;
                     seen.insert(newData); // Mark as seen
                 }
 
@@ -488,7 +478,7 @@ std::vector<CollegeData> planEfficientRoute(const std::string startCollege, std:
     std::string currentCollege = startCollege;
     totalDistance = 0.0;
 
-    for (int i = 0; i <= stops; ++i) {
+    for (int i = 0; i < stops; ++i) {
         int nextIndex;
         float distance = findClosestCollege(currentCollege, data, visitedCampuses, nextIndex);
 

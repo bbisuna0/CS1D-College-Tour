@@ -91,6 +91,7 @@ void maintenance::on_saveSouvenirDataButton_clicked()
 
 void maintenance::on_loadUpdatedCollegeDataButton_clicked()
 {
+    collegeList.clear();
     collegeList = loadCollegeDataCSV(UPDATED_COLLEGE_FILE);
     showFileLoadedMessage(this, QString::fromStdString(UPDATED_COLLEGE_FILE));
 }
@@ -99,6 +100,7 @@ void maintenance::on_loadUpdatedCollegeDataButton_clicked()
 void maintenance::on_loadUpdatedSouvenirDataButton_clicked()
 {
     // load souvenir data for distances (default data)
+    souvenirList.clear();
     souvenirList = loadSouvenirCSV(UPDATED_SOUVENIR_FILE);
     showFileLoadedMessage(this, QString::fromStdString(UPDATED_SOUVENIR_FILE));
 }

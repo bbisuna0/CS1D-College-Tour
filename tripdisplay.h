@@ -16,7 +16,7 @@ class tripdisplay : public QDialog
 
 public:
     explicit tripdisplay(QWidget *parent = nullptr);
-    explicit tripdisplay(const std::vector<CollegeData>& data, float totalDistance, QWidget *parent = nullptr);
+    explicit tripdisplay(const std::vector<CollegeData>& data, float totalDistance, std::vector<SouvenirData>& souvenirListParm, QWidget *parent = nullptr);
     ~tripdisplay();
 
 private slots:
@@ -36,6 +36,7 @@ private:
     Ui::tripdisplay *ui;
     QStandardItemModel *model;
     QSortFilterProxyModel *proxyModel;
+    std::vector<SouvenirData> souvenirList;
 };
 
 

@@ -14,7 +14,7 @@ tripdisplay::tripdisplay(QWidget *parent)
 
 }
 
-tripdisplay::tripdisplay(const std::vector<CollegeData>& data, float totalDistance, QWidget *parent)
+tripdisplay::tripdisplay(const std::vector<CollegeData>& data, float totalDistance, std::vector<SouvenirData>& souvenirListParm, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::tripdisplay)
 {
@@ -43,7 +43,7 @@ tripdisplay::tripdisplay(const std::vector<CollegeData>& data, float totalDistan
     ui->tableView->setColumnWidth(2, 100);
     ui->label_2->setText(QString::fromStdString("Total Distance Travelled: ") + QString::number(totalDistance, 'f', 2));
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-
+    souvenirList = souvenirListParm;
 
 
 
@@ -65,17 +65,18 @@ void tripdisplay::on_buttonBox_accepted()
 
 void tripdisplay::on_saddlebackPB_clicked()
 {
-    std::vector<SouvenirData> data;
-    data = loadSouvenirCSV("souvenirs1.csv");
+    //std::vector<SouvenirData> data;
+    //data = loadSouvenirCSV("souvenirs1.csv");
     std::vector<SouvenirPurchase> editData;
     SouvenirPurchase editRow;
-    for (auto row : data) {
+    for (auto row : souvenirList) {
         editRow.college = row.college;
         editRow.souvenir =  row.souvenir;
         editRow.cost =row.cost;
         editRow.quantity = 0;
         if (isCollegeMatch(model, QString::fromStdString(row.college))){
             editData.push_back(editRow);
+            qDebug() << QString::fromStdString(row.college);
         }
     }
     purchasesouvenirs c(editData, this);
