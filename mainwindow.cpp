@@ -51,7 +51,6 @@ void MainWindow::on_collegeDistanceButton_clicked()
 
 void MainWindow::on_pushButton_6_clicked()
 {
-
     this->close();
 }
 

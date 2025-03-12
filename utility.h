@@ -23,19 +23,27 @@
 #include <set>
 #include <QLabel>
 
-
+/**
+ * @struct CollegeData
+ * @brief Represents the distance between two colleges.
+ */
 struct CollegeData {
-    std::string collegeStart;
-    std::string collegeEnd;
-    float distance;
+    std::string collegeStart; /**< The starting college. */
+    std::string collegeEnd; /**< The destination college. */
+    float distance; /**< The distance between the two colleges. */
 
+    /// @brief Equality operator for comparing two CollegeData objects.
     bool operator==(const CollegeData& other) const {
-        //return collegeStart == other.collegeStart && collegeEnd == other.collegeEnd && distance == other.distance;
         return collegeStart == other.collegeStart && collegeEnd == other.collegeEnd;
     }
 };
 
+
 namespace std {
+/**
+ * @struct hash<CollegeData>
+ * @brief Hash function for CollegeData struct.
+ */
 template <>
 struct hash<CollegeData> {
     std::size_t operator()(const CollegeData& data) const {
@@ -47,25 +55,52 @@ struct hash<CollegeData> {
 };
 }
 
+
+/**
+ * @struct SouvenirData
+ * @brief Represents a souvenir available at a college.
+ */
 struct SouvenirData {
-    std::string college;
-    std::string souvenir;
-    std::string cost;
+    std::string college; /**< The name of the college. */
+    std::string souvenir; /**< The name of the souvenir. */
+    std::string cost; /**< The cost of the souvenir. */
 };
 
+
+/**
+ * @struct SouvenirPurchase
+ * @brief Represents a purchased souvenir with quantity.
+ */
 struct SouvenirPurchase {
-    std::string college;
-    std::string souvenir;
-    std::string cost;
-    int quantity;
+    std::string college; /**< The name of the college. */
+    std::string souvenir; /**< The name of the souvenir. */
+    std::string cost; /**< The cost of the souvenir. */
+    int quantity; /**< The quantity of the souvenir purchased. */
 };
 
+
+/**
+ * @struct MinHeapNode
+ * @brief Represents college distances for efficient search.
+ */
+struct MinHeapNode {
+    std::string collegeEnd;
+    float distance;
+    bool operator>(const MinHeapNode& other) const {
+        return distance > other.distance;
+    }
+};
+
+
+// File constants
 const std::string ORIGINAL_COLLEGE_FILE = "college_original.csv";
 const std::string ORIGINAL_SOUVENIR_FILE = "souvenir_original.csv";
 const std::string UPDATED_COLLEGE_FILE = "college_updated.csv";
 const std::string UPDATED_SOUVENIR_FILE = "souvenir_updated.csv";
 const std::string BULK_FILE = "college_bulk.csv";
 
+
+// Function declarations
 void createUserTable(); // QSqlDatabase &db
 bool checkUserTable(); // check if user table exists
 void addUser(int ID, QString username, QString password, bool admin); // add user data into database
@@ -86,13 +121,23 @@ void showFileLoadedMessage(QWidget* parent, const QString filename);
 void showFileSavedMessage(QWidget* parent, const QString filename);
 void saveCollegeListToCSV(const std::vector<CollegeData>& collegeList, const std::string& filename);
 void saveSouvenirListToCSV(const std::vector<SouvenirData>& souvenirList, const std::string& filename);
-
+std::vector<CollegeData> planEfficientTrip2( const QStringList& collegesToVisit, std::vector<CollegeData> data, float& totalDistance);
 
 
 extern QSqlDatabase db;
 
+
+/**
+ * @class CollegeSelectionDialog
+ * @brief Dialog for selecting colleges to visit.
+ */
 class CollegeSelectionDialog : public QDialog {
 public:
+    /**
+     * @brief Constructs a CollegeSelectionDialog.
+     * @param data The list of colleges available for selection.
+     * @param parent Optional parent widget.
+     */
     CollegeSelectionDialog(const std::vector<CollegeData>& data, QWidget* parent = nullptr) : QDialog(parent) {
         setWindowTitle("Select Colleges to Visit");
 
@@ -131,6 +176,11 @@ public:
         populateAvailableList(data);
     }
 
+
+    /**
+     * @brief Retrieves the selected colleges.
+     * @return A list of selected colleges.
+     */
     QStringList getSelectedColleges() const {
         QStringList selected;
         for (int i = 0; i < selectedList->count(); ++i) {
@@ -140,6 +190,7 @@ public:
     }
 
 private:
+    /// @brief Populates the available colleges list.
     void populateAvailableList(const std::vector<CollegeData>& data) {
         std::set<std::string> uniqueColleges;
         for (const auto& college : data) {
@@ -152,6 +203,8 @@ private:
         }
     }
 
+
+    /// @brief Moves a selected college to the selected list.
     void addSelected() {
         QListWidgetItem* item = availableList->currentItem();
         if (item) {
@@ -160,6 +213,8 @@ private:
         }
     }
 
+
+    /// @brief Removes a college from the selected list
     void removeSelected() {
         QListWidgetItem* item = selectedList->currentItem();
         if (item) {
@@ -176,8 +231,18 @@ private:
     QPushButton* cancelButton;
 };
 
+
+/**
+ * @class PurchaseSummaryDialog
+ * @brief Dialog for summarizing purchases.
+ */
 class PurchaseSummaryDialog : public QDialog {
 public:
+    /**
+     * @brief Constructs a PurchaseSummaryDialog.
+     * @param model The data model containing purchase information.
+     * @param parent Optional parent widget.
+     */
     PurchaseSummaryDialog(QStandardItemModel* model, QWidget* parent = nullptr) : QDialog(parent) {
         setWindowTitle("Purchase Summary");
         resize(650, 400); // Increase dialog size to fit data
@@ -208,6 +273,7 @@ public:
     }
 
 private:
+    /// @brief Converts a string with a dollar sign to a float.
     float stringToFloatDollar(const QString& str) {
         QString modifiedStr = str.trimmed();
         if (!modifiedStr.isEmpty() && modifiedStr[0] == '$') {
@@ -218,6 +284,7 @@ private:
         return ok ? result : 0.0f; // Return 0.0 if conversion fails
     }
 
+    /// @brief Calculates the total purchases per college.
     void calculateSummary(QStandardItemModel* model) {
         if (!model) return;
 
@@ -271,7 +338,7 @@ private:
     }
 
 
-
+    /// @brief Updates the purchase summary when an item changes.
     void onItemChanged(QStandardItem* item) {
         if (item->column() == 3) { // Only react to quantity changes
             calculateSummary(item->model()); // Recalculate totals with updated data

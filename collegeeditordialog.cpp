@@ -116,6 +116,17 @@ void CollegeEditorDialog::validateCell(int row, int column)
         QMessageBox::warning(this, "Invalid Input", "Fields cannot be left empty!");
         item->setText("N/A");  // Reset to a default value
     }
+    if (column == 2) {
+        QTableWidgetItem *item = ui->collegeTableWidget->item(row, column);
+        if (item) {
+            bool ok;
+            item->text().toDouble(&ok);  // Convert text to double and check validity
+            if (!ok) {
+                QMessageBox::warning(this, "Invalid Input", "Please enter a valid decimal number.");
+                item->setText("0.0");  // Reset to a default value
+            }
+        }
+    }
 }
 
 

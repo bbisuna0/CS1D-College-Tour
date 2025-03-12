@@ -52,8 +52,11 @@ int main(int argc, char *argv[])
     */
     if (!myUser.login_ok)
     {
+        a.quit();
+        QString connectionName = db.connectionName();
         db.close();
-        exit(0);
+        QSqlDatabase::removeDatabase(connectionName);
+        return 0;
     }
 
     // load college data for distances (default data)
@@ -62,11 +65,13 @@ int main(int argc, char *argv[])
     collegeList = loadCollegeDataCSV(UPDATED_COLLEGE_FILE);
     souvenirList = loadSouvenirCSV(UPDATED_SOUVENIR_FILE);
 
-    MainWindow w(collegeList, souvenirList, NULL);
+    MainWindow w(collegeList, souvenirList, nullptr);
     //w.show();
     w.showNormal();
+    int result = a.exec();
+    w.close();
+    QString connectionName = db.connectionName();
     db.close();
-    return a.exec();
-    //a.quit();
-    //exit(0);
+    QSqlDatabase::removeDatabase(connectionName);
+    exit(result);
 }

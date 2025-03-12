@@ -10,11 +10,29 @@
 #include <QPainter>
 #include <QHeaderView>
 
+/**
+ * @class MergedTableView
+ * @brief A custom QTableView with merged cells functionality.
+ *
+ * This class extends QTableView to provide the ability to merge consecutive
+ * cells in a specified column if they contain the same value.
+ */
 class MergedTableView : public QTableView {
 public:
+    /**
+     * @brief Constructs a MergedTableView object.
+     * @param parent Optional parent widget.
+     */
     MergedTableView(QWidget *parent = nullptr) : QTableView(parent) {}
 
 protected:
+    /**
+     * @brief Handles the paint event to merge table cells.
+     * @param event The paint event.
+     *
+     * This function iterates through the model and merges consecutive rows
+     * in a specified column if they contain the same value.
+     */
     void paintEvent(QPaintEvent *event) override {
         QTableView::paintEvent(event);
 
@@ -56,6 +74,15 @@ protected:
     }
 
 private:
+    /**
+     * @brief Merges consecutive cells in a column.
+     * @param column The column in which merging should occur.
+     * @param startRow The starting row of the merge.
+     * @param endRow The ending row of the merge.
+     *
+     * This function visually merges consecutive cells in the given column
+     * by setting only the first cell's data and clearing the others.
+     */
     void mergeCells(int column, int startRow, int endRow) {
         QStandardItemModel *model = qobject_cast<QStandardItemModel*>(this->model());
         if (!model) return;

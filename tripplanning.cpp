@@ -37,7 +37,7 @@ void tripplanning::on_visitSBCButton_clicked()
     // data = loadCollegeDataCSV("collegedist1.csv");
     std::vector<CollegeData> trip;
     float totalDistance;
-    trip = planEfficientRoute("Saddleback College", collegeList, 10, totalDistance);
+    trip = planEfficientRoute("Saddleback College", collegeList, 11, totalDistance);
     // qDebug() << QString::fromStdString(data[6].collegeStart);
     // qDebug() << QString::fromStdString(data[6].collegeEnd);
     // qDebug() << data[6].distance;
@@ -70,7 +70,7 @@ void tripplanning::on_uciTripButton_clicked()
     // data = loadCollegeDataCSV("collegedist1.csv");
     std::vector<CollegeData> trip;
     float totalDistance;
-    trip = planEfficientRoute("University of California, Irvine (UCI)", collegeList, 12, totalDistance);
+    trip = planEfficientRoute("University of California, Irvine (UCI)", collegeList, 13, totalDistance);
     tripdisplay c(trip, totalDistance, souvenirList, this);
     c.exec();
 }

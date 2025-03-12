@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <unordered_set>
 #include <set>
+#include <unordered_map>
+#include <queue>
 
 /**
  * @brief Establishes a connection to the SQLite database.
@@ -727,3 +729,75 @@ void saveSouvenirListToCSV(const std::vector<SouvenirData>& souvenirList, const 
 
     outFile.close();
 }
+
+
+std::vector<CollegeData> planEfficientTrip2( const QStringList& collegesToVisit, std::vector<CollegeData> data, float& totalDistance) {
+    std::vector<CollegeData> route;
+    totalDistance = 0.0;
+
+    if (collegesToVisit.isEmpty()) {
+        return route; // Return empty route if no colleges are provided
+    }
+
+    // Step 1: Convert `data` into an adjacency list for faster lookups
+    std::unordered_map<std::string, std::vector<std::pair<std::string, float>>> adjacencyList;
+    for (const auto& entry : data) {
+        adjacencyList[entry.collegeStart].emplace_back(entry.collegeEnd, entry.distance);
+    }
+
+    // Step 2: Convert `collegesToVisit` into sets for quick access
+    std::unordered_set<std::string> remainingColleges;
+    for (int i = 0; i < collegesToVisit.size(); ++i) {
+        remainingColleges.insert(collegesToVisit[i].toStdString());
+    }
+
+    std::string currentCollege = collegesToVisit.first().toStdString();
+    remainingColleges.erase(currentCollege);
+
+    std::unordered_set<std::string> visitedCampuses;
+    visitedCampuses.insert(currentCollege);
+
+    // Step 3: Min-Heap (Priority Queue) to always pick the closest college
+    std::priority_queue<MinHeapNode, std::vector<MinHeapNode>, std::greater<>> minHeap;
+
+    // Load initial connections from starting college
+    for (const auto& neighbor : adjacencyList[currentCollege]) {
+        if (remainingColleges.count(neighbor.first)) {
+            minHeap.push({neighbor.first, neighbor.second});
+        }
+    }
+
+    // Step 4: Process until all required colleges are visited
+    while (!remainingColleges.empty() && !minHeap.empty()) {
+        MinHeapNode closest = minHeap.top();
+        minHeap.pop();
+
+        // Skip if already visited
+        if (visitedCampuses.count(closest.collegeEnd)) {
+            continue;
+        }
+
+        // Find the corresponding CollegeData entry
+        for (const auto& entry : data) {
+            if (entry.collegeStart == currentCollege && entry.collegeEnd == closest.collegeEnd) {
+                route.push_back(entry);
+                totalDistance += closest.distance;
+                break;
+            }
+        }
+
+        currentCollege = closest.collegeEnd;
+        visitedCampuses.insert(currentCollege);
+        remainingColleges.erase(currentCollege);
+
+        // Add new connections from the newly visited college
+        for (const auto& neighbor : adjacencyList[currentCollege]) {
+            if (remainingColleges.count(neighbor.first)) {
+                minHeap.push({neighbor.first, neighbor.second});
+            }
+        }
+    }
+
+    return route;
+}
+
